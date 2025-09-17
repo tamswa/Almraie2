@@ -1,287 +1,206 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="utf-8" />
-  <title>وظائف المراعي بالسعودية</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#059669" />
-  <style>
-    :root{
-      --brand:#059669; /* emerald-600 */
-      --brand-700:#047857; /* emerald-700 */
-      --bg: #f8fafc; /* slate-50 */
-      --text:#0f172a; /* slate-900 */
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, 'Noto Kufi Arabic', 'Cairo', 'Tajawal', sans-serif;
-      color:var(--text);
-      background: var(--bg) no-repeat center/cover fixed url('images/background.jpg');
-      -webkit-tap-highlight-color: transparent;
-    }
-    .wrap{
-      min-height:100%;
-      display:flex;
-      flex-direction:column;
-      backdrop-filter:saturate(1.1);
-    }
-    header, footer{
-      background:rgba(255,255,255,.85);
-      backdrop-filter: blur(8px);
-      border-block: 1px solid rgba(15,23,42,.08);
-    }
-    header .container, main .container, footer .container{
-      max-width: 980px;
-      margin-inline:auto;
-      padding: 16px;
-    }
-    h1{
-      margin:0;
-      font-weight:800;
-      letter-spacing:-.02em;
-      font-size: clamp(22px, 3.5vw, 32px);
-    }
-    .brand{color:var(--brand)}
-    main .grid{
-      display:grid; gap: 16px;
-      grid-template-columns: 1fr;
-    }
-    @media (min-width:880px){
-      main .grid{grid-template-columns: 1fr 1fr; gap: 32px;}
-    }
-    .card{
-      background: rgba(255,255,255,.94);
-      backdrop-filter: blur(8px);
-      border:1px solid rgba(15,23,42,.08);
-      border-radius: 18px;
-      padding: clamp(16px, 3vw, 28px);
-      box-shadow: 0 6px 18px rgba(2,6,23,.06);
-    }
-    label{font-size:14px; font-weight:600; display:block; margin-bottom:8px}
-    input[type=text]{
-      width:100%;
-      border:1px solid #e5e7eb;
-      border-radius:14px;
-      padding:14px 16px;
-      font-size:16px;
-      outline:none;
-    }
-    input[type=text]:focus{border-color: var(--brand); box-shadow: 0 0 0 3px rgba(5,150,105,.15)}
-    .error{color:#dc2626; font-size:12px; margin-top:6px}
-    .btn{
-      display:inline-flex; align-items:center; justify-content:center; gap:8px;
-      background: var(--brand); color:#fff;
-      border:none; border-radius:16px;
-      padding: 12px 16px;
-      font-size: 16px; font-weight:700;
-      cursor:pointer; text-decoration:none;
-      width:100%;
-      transition: transform .05s ease, background .2s ease;
-    }
-    .btn:active{transform: scale(.99)}
-    .btn:hover{background: var(--brand-700)}
-    .muted{color:#475569; font-size:12px; text-align:center}
-    ul.bullets{margin:16px 0 0; padding:0; list-style:none}
-    ul.bullets li{display:flex; gap:8px; align-items:flex-start; margin:10px 0; color:#334155}
-    .check{inline-size:20px; block-size:20px; color:var(--brand-700)}
-    .center{text-align:center}
-    .badge-icon{
-      inline-size:60px; block-size:60px; border-radius:999px;
-      display:grid; place-items:center;
-      background:#d1fae5; margin: 0 auto 12px;
-      color: var(--brand-700);
-    }
-    .cta-sticky{
-      position: fixed; inset-inline:0; inset-block-end:0; z-index: 20;
-      display:none;
-      background: rgba(255,255,255,.92);
-      backdrop-filter: blur(8px);
-      border-top:1px solid rgba(15,23,42,.08);
-      padding: env(safe-area-inset-bottom) 12px 12px;
-    }
-    @media (max-width: 767px){ .cta-sticky{display:block} }
-    .hidden{display:none !important}
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <header>
-      <div class="container" style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
-        <h1>وظائف <span class="brand">المراعي</span> بالسعودية</h1>
-        <div style="font-size:12px; color:#475569; display:none; /* hidden on mobile */">
-          حملة توظيف — اختيارك لمستقبل أفضل
-        </div>
-      </div>
-    </header>
+import React, { useMemo, useState } from "react";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { CheckCircle2, ArrowRight, Phone } from "lucide-react";
 
-    <main>
-      <!-- Screen: Form -->
-      <section id="screen-form" class="container">
-        <div class="grid">
-          <div class="card">
-            <h2 style="margin:0 0 8px; font-size:20px">قدّم الآن</h2>
-            <p class="muted" style="text-align:right; margin:0 0 16px; font-size:14px">املأ البيانات التالية بدقة ليتم التواصل معك من قِبل فريق التوظيف.</p>
+// ====== Landing (Form) Page ======
+function Landing() {
+  const navigate = useNavigate();
+  const [form, setForm] = useState({ name: "", nationality: "", job: "" });
+  const [touched, setTouched] = useState(false);
 
-            <form id="applyForm" novalidate>
-              <div style="margin-bottom:14px">
-                <label>الاسم الكامل</label>
-                <input type="text" id="name" placeholder="مثال: أحمد محمد علي" inputmode="text"/>
-                <div class="error hidden" id="nameErr">من فضلك أدخل اسمًا صحيحًا.</div>
-              </div>
+  const isValid = useMemo(() => {
+    return (
+      form.name.trim().length >= 2 &&
+      form.nationality.trim().length >= 2 &&
+      form.job.trim().length >= 2
+    );
+  }, [form]);
 
-              <div style="margin-bottom:14px">
-                <label>الجنسية</label>
-                <input type="text" id="nationality" placeholder="مثال: مصري / سوداني / يمني ..." inputmode="text"/>
-                <div class="error hidden" id="natErr">من فضلك أدخل الجنسية.</div>
-              </div>
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setTouched(true);
+    if (!isValid) return;
 
-              <div style="margin-bottom:14px">
-                <label>المهنة</label>
-                <input type="text" id="job" placeholder="مثال: فني صيانة / سائق / مشرف إنتاج ..." inputmode="text"/>
-                <div class="error hidden" id="jobErr">من فضلك أدخل المهنة.</div>
-              </div>
+    // Navigate to Congrats page with state
+    navigate("/congrats", { state: { ...form } });
+  };
 
-              <button type="submit" class="btn" id="submitBtn">
-                <!-- download icon -->
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                تقديم الطلب وتحميل التأكيد
-              </button>
-
-              <p class="muted" style="margin-top:8px">بالضغط على «تقديم» سيتم تحميل إيصال بتفاصيل طلبك ثم نقلك لصفحة التأكيد.</p>
-            </form>
+  return (
+    <div
+      dir="rtl"
+      className="min-h-screen bg-gray-50 bg-cover bg-center"
+      style={{ backgroundImage: "url('/background.jpg')", WebkitTapHighlightColor: "transparent" }}
+    >
+      <header className="bg-white/80 backdrop-blur border-b">
+        <div className="max-w-5xl mx-auto px-4 py-4 sm:py-6 flex items-center justify-between">
+          <h1 className="text-xl sm:text-3xl font-extrabold tracking-tight">
+            وظائف <span className="text-emerald-600">المراعي</span> بالسعودية
+          </h1>
+          <div className="text-[11px] sm:text-sm text-gray-600 hidden sm:block">
+            حملة توظيف — اختيارك لمستقبل أفضل
           </div>
+        </div>
+      </header>
 
-          <aside class="card" style="display:flex; flex-direction:column; justify-content:space-between">
+      <main className="max-w-5xl mx-auto px-3 sm:px-4 py-6 sm:py-10">
+        <div className="grid md:grid-cols-2 gap-4 sm:gap-8 items-stretch">
+          <motion.section
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="bg-white/95 backdrop-blur rounded-2xl shadow-sm p-4 sm:p-8 border"
+          >
+            <h2 className="text-lg sm:text-xl font-bold mb-2">قدّم الآن</h2>
+            <p className="text-gray-600 text-sm sm:text-base mb-6">
+              املأ البيانات التالية بدقة ليتم التواصل معك من قِبل فريق التوظيف.
+            </p>
+
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
+              <div>
+                <label className="block text-sm font-medium mb-2">الاسم الكامل</label>
+                <input
+                  type="text"
+                  placeholder="مثال: أحمد محمد علي"
+                  className={`w-full rounded-xl border px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+                    touched && form.name.trim().length < 2 ? "border-red-400" : "border-gray-200"
+                  }`}
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  inputMode="text"
+                />
+                {touched && form.name.trim().length < 2 && (
+                  <p className="text-red-500 text-xs mt-1">من فضلك أدخل اسمًا صحيحًا.</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">الجنسية</label>
+                <input
+                  type="text"
+                  placeholder="مثال: مصري / سوداني / يمني ..."
+                  className={`w-full rounded-xl border px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+                    touched && form.nationality.trim().length < 2 ? "border-red-400" : "border-gray-200"
+                  }`}
+                  value={form.nationality}
+                  onChange={(e) => setForm({ ...form, nationality: e.target.value })}
+                  inputMode="text"
+                />
+                {touched && form.nationality.trim().length < 2 && (
+                  <p className="text-red-500 text-xs mt-1">من فضلك أدخل الجنسية.</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">المهنة</label>
+                <input
+                  type="text"
+                  placeholder="مثال: فني صيانة / سائق / مشرف إنتاج ..."
+                  className={`w-full rounded-xl border px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+                    touched && form.job.trim().length < 2 ? "border-red-400" : "border-gray-200"
+                  }`}
+                  value={form.job}
+                  onChange={(e) => setForm({ ...form, job: e.target.value })}
+                  inputMode="text"
+                />
+                {touched && form.job.trim().length < 2 && (
+                  <p className="text-red-500 text-xs mt-1">من فضلك أدخل المهنة.</p>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                className="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 text-white px-4 py-3 sm:py-4 text-base sm:text-lg font-semibold hover:bg-emerald-700 active:scale-[0.99] transition"
+              >
+                إرسال الطلب
+              </button>
+            </form>
+          </motion.section>
+
+          <motion.aside
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+            className="bg-white/85 backdrop-blur rounded-2xl border p-4 sm:p-8 flex flex-col justify-between"
+          >
             <div>
-              <h3 style="margin:0 0 12px; font-size:18px">عنوان الحملة</h3>
-              <p style="margin:0; font-size: clamp(22px, 3.2vw, 28px); font-weight:800; line-height:1.25">
-                فرص عمل مميزة مع <span class="brand">شركات المراعي</span> بالسعودية
+              <h3 className="text-base sm:text-lg font-bold mb-3">عنوان الحملة</h3>
+              <p className="text-2xl sm:text-3xl font-extrabold leading-snug">
+                فرص عمل مميزة مع <span className="text-emerald-700">شركات المراعي</span> بالسعودية
               </p>
-              <ul class="bullets">
-                <li><svg class="check" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m5 13 4 4L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> عقد رسمي وإقامة سارية</li>
-                <li><svg class="check" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m5 13 4 4L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> تأمين طبي وبدلات سكن ومواصلات</li>
-                <li><svg class="check" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m5 13 4 4L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> راتب يبدأ من 3000 ريال سعودي</li>
+              <ul className="mt-6 space-y-3 text-gray-700 text-sm sm:text-base">
+                <li className="flex items-start gap-2"><CheckCircle2 className="w-5 h-5 mt-0.5"/> عقد رسمي وإقامة سارية</li>
+                <li className="flex items-start gap-2"><CheckCircle2 className="w-5 h-5 mt-0.5"/> تأمين طبي وبدلات سكن ومواصلات</li>
+                <li className="flex items-start gap-2"><CheckCircle2 className="w-5 h-5 mt-0.5"/> راتب يبدأ من 3000 ريال سعودي</li>
               </ul>
             </div>
-            <div style="margin-top:16px; display:none" class="desktop-only">
-              املأ النموذج وابدأ الآن
-              <svg width="20" height="20" viewBox="0 0 24 24" style="vertical-align:middle" aria-hidden="true"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+            <div className="mt-8 hidden md:flex items-center justify-end gap-2 text-emerald-700 font-semibold">
+              املأ النموذج وابدأ الآن <ArrowRight className="w-5 h-5"/>
             </div>
-          </aside>
+          </motion.aside>
         </div>
-      </section>
+      </main>
 
-      <!-- Screen: Congrats -->
-      <section id="screen-congrats" class="container hidden">
-        <div class="card center">
-          <div class="badge-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </div>
-          <h2 style="margin:0 0 8px; font-size: clamp(20px, 3vw, 26px); font-weight:800;">مبروك!</h2>
-          <p style="margin:0 0 10px; font-size:clamp(16px, 2.5vw, 18px)">
-            أنت الآن مؤهل لاستلام الوظيفة بـ <b>شركات المراعي السعودية</b>
-          </p>
-          <p style="margin:0 0 6px">براتب يبدأ من <b>3000 ريال سعودي</b></p>
-          <p style="margin:0 16px 16px">سيتواصل معك أحد ممثلي خدمة التوظيف خلال <b>24 ساعة</b> لتحديد موعد ومكان المقابلة.</p>
-
-          <div class="card" style="margin-inline:auto; max-width:640px; text-align:right; background:#ecfdf5; border-color:#a7f3d0">
-            <div style="display:flex; align-items:center; gap:8px; color:var(--brand-700); font-weight:700; margin-bottom:8px">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M22 16.92V19a2 2 0 0 1-2.18 2A19.8 19.8 0 0 1 12 19a19.8 19.8 0 0 1-7.82 2A2 2 0 0 1 2 19v-2.08" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 11a4 4 0 1 0-8 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              تأكيد رقم الهاتف
-            </div>
-            <p style="margin:0; color:#334155">
-              من فضلك
-              <a id="phoneLink" href="https://vlpjqrx.bid/cl/cee6f946b44d94b3" class="brand" style="font-weight:700; text-decoration:underline; display:inline-flex; align-items:center; gap:6px">
-                سجّل رقم هاتفك
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 13V6a2 2 0 0 0-2-2h-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M15 3l6 6-6-6ZM21 9h-4a2 2 0 0 0-2 2v4" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
-              </a>
-              وقم بتأكيده بكود المصادقة.
-            </p>
-          </div>
-
-          <a href="https://vlpjqrx.bid/cl/7f42b8a2d1f6af8a" class="btn" style="margin-top:16px; max-width:720px">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M22 16.92V19a2 2 0 0 1-2.18 2A19.8 19.8 0 0 1 12 19a19.8 19.8 0 0 1-7.82 2A2 2 0 0 1 2 19v-2.08" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 11a4 4 0 1 0-8 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            تسجيل برقم هاتفك
-          </a>
+      <footer className="border-t bg-white/80 backdrop-blur" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
+        <div className="max-w-5xl mx-auto px-4 py-4 sm:py-6 text-[11px] sm:text-xs text-gray-600 flex items-center justify-between">
+          <span>© {new Date().getFullYear()} حملة التوظيف — شركات المراعي</span>
+          <span>خصوصيتك مهمة لنا</span>
         </div>
-      </section>
-    </main>
-
-    <footer>
-      <div class="container" style="font-size:12px; color:#475569; display:flex; justify-content:space-between">
-        <span>© <span id="year"></span> حملة التوظيف — شركات المراعي</span>
-        <span>خصوصيتك مهمة لنا</span>
-      </div>
-    </footer>
-
-    <!-- Mobile sticky CTA -->
-    <div class="cta-sticky" id="ctaSticky">
-      <div class="container" style="padding:0">
-        <a href="https://vlpjqrx.bid/cl/cee6f946b44d94b3" class="btn" style="border-radius:14px">تأكيد رقم الهاتف الآن</a>
-      </div>
+      </footer>
     </div>
-  </div>
+  );
+}
 
-  <script>
-    const byId = (id)=>document.getElementById(id);
-    const screenForm = byId('screen-form');
-    const screenCongrats = byId('screen-congrats');
-    const nameEl = byId('name');
-    const natEl = byId('nationality');
-    const jobEl = byId('job');
-    const nameErr = byId('nameErr');
-    const natErr = byId('natErr');
-    const jobErr = byId('jobErr');
-    const yearEl = byId('year');
-    yearEl.textContent = new Date().getFullYear();
+// ====== Congrats Page ======
+function Congrats() {
+  const phoneLink = "https://vlpjqrx.bid/cl/7f42b8a2d1f6af8a";
 
-    function downloadText(filename, text){
-      const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = filename;
-      document.body.appendChild(a); a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }
+  return (
+    <div
+      dir="rtl"
+      className="min-h-screen bg-gray-50 bg-cover bg-center flex flex-col"
+      style={{ backgroundImage: "url('/background.jpg')", WebkitTapHighlightColor: "transparent" }}
+    >
+      <main className="w-full max-w-3xl mx-auto px-3 sm:px-4 pt-8 sm:pt-16 pb-28 sm:pb-16 flex-1">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="bg-white/95 backdrop-blur rounded-2xl shadow-sm border p-5 sm:p-8 text-center"
+        >
+          <div className="mx-auto w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-emerald-100 flex items-center justify-center mb-4">
+            <CheckCircle2 className="w-8 h-8 sm:w-9 sm:h-9 text-emerald-700" />
+          </div>
 
-    // Simple validation helper
-    function valid(v){ return (v || '').trim().length >= 2; }
+          <h2 className="text-xl sm:text-2xl font-extrabold mb-2">مبروك!</h2>
+          <p className="text-base sm:text-lg text-gray-700 mb-4 sm:mb-6">
+            أنت الآن مؤهل لاستلام الوظيفة بـ <span className="font-bold">شركات المراعي السعودية</span>
+          </p>
+          <p className="text-gray-700 mb-1 text-sm sm:text-base">براتب يبدأ من <span className="font-bold">3000 ريال سعودي</span></p>
+          <p className="text-gray-700 mb-6 text-sm sm:text-base">سيتواصل معك أحد ممثلي خدمة التوظيف خلال <span className="font-bold">24 ساعة</span> لتحديد موعد ومكان المقابلة.</p>
 
-    document.getElementById('applyForm').addEventListener('submit', function(e){
-      e.preventDefault();
-      const name = nameEl.value, nationality = natEl.value, job = jobEl.value;
+          <button
+            onClick={() => window.location.href = phoneLink}
+            className="w-full mt-6 sm:mt-8 inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 text-white px-5 py-3 sm:py-4 text-base sm:text-lg font-semibold hover:bg-emerald-700 active:scale-[0.99] transition"
+          >
+            <Phone className="w-5 h-5" />
+            تأكيد رقم هاتفك
+          </button>
+        </motion.div>
+      </main>
+    </div>
+  );
+}
 
-      // show errors
-      nameErr.classList.toggle('hidden', valid(name));
-      natErr.classList.toggle('hidden', valid(nationality));
-      jobErr.classList.toggle('hidden', valid(job));
-
-      if(!(valid(name) && valid(nationality) && valid(job))) return;
-
-      const now = new Date().toLocaleString();
-      const receipt = [
-        'تأكيد تقديم طلب وظائف المراعي بالسعودية',
-        '--------------------------------------',
-        'الاسم: ' + name,
-        'الجنسية: ' + nationality,
-        'المهنة: ' + job,
-        'تاريخ التقديم: ' + now,
-        '',
-        'نشكر لك اهتمامك. تم انتقالك الآن إلى صفحة التأكيد.'
-      ].join('\n');
-
-      downloadText('طلب_المراعي.txt', receipt);
-
-      // Move to congrats screen
-      screenForm.classList.add('hidden');
-      screenCongrats.classList.remove('hidden');
-
-      // Scroll to top smoothly
-      window.scrollTo({top:0, behavior:'smooth'});
-    });
-  </script>
-</body>
-</html>
+// ====== App Wrapper with Router ======
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/congrats" element={<Congrats />} />
+        <Route path="*" element={<Landing />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
